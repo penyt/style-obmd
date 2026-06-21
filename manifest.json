@@ -1,0 +1,11 @@
+{
+	"id": "style-obmd",
+	"name": "Style Obmd",
+	"version": "1.0.0",
+	"minAppVersion": "1.0.0",
+	"description": "A plugin to have some more styles based on the Obsidian markdown syntax.",
+	"author": "penyt",
+	"authorUrl": "https://github.com/penyt",
+	"fundingUrl": "https://www.buymeacoffee.com/penyt",
+	"isDesktopOnly": false
+}
