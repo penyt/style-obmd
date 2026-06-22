@@ -1,8 +1,69 @@
-/*
+/* Reading view & Live Preview */
+.cmk-mark {
+	/* padding: 0 0.12em; */
+	/* border-radius: 0.2em; */
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+/* 隱藏語法標記 */
+.cmk-hide {
+	font-size: 0;
+	width: 0;
+	display: inline-block;
+	overflow: hidden;
+}
 
-If your plugin does not need CSS, delete this file.
+.cmk-mark.cmk-r,
+mark.cmk-r {
+	background: rgba(251, 70, 70, 0.3) !important;
+}
+.cmk-mark.cmk-o,
+mark.cmk-o {
+	background: rgba(233, 120, 63, 0.3) !important;
+}
+.cmk-mark.cmk-y,
+mark.cmk-y {
+	background: rgba(224, 172, 0, 0.3) !important;
+}
+.cmk-mark.cmk-g,
+mark.cmk-g {
+	background: rgba(68, 207, 110, 0.3) !important;
+}
+.cmk-mark.cmk-b,
+mark.cmk-b {
+	background: rgba(83, 137, 223, 0.3) !important;
+}
+.cmk-mark.cmk-p,
+mark.cmk-p {
+	background: rgba(190, 117, 255, 0.3) !important;
+}
+.cmk-mark.cmk-gray,
+mark.cmk-gray {
+	background: rgba(158, 158, 158, 0.3) !important;
+}
 
-*/
+.cmk-bold.cmk-r {
+	color: rgb(251, 70, 70) !important;
+}
+.cmk-bold.cmk-o {
+	color: rgb(233, 120, 63) !important;
+}
+.cmk-bold.cmk-y {
+	color: rgb(224, 172, 0) !important;
+}
+.cmk-bold.cmk-g {
+	color: rgb(68, 207, 110) !important;
+}
+.cmk-bold.cmk-b {
+	color: rgb(83, 137, 223) !important;
+}
+.cmk-bold.cmk-p {
+	color: rgb(190, 117, 255) !important;
+}
+.cmk-bold.cmk-gray {
+	color: rgb(158, 158, 158) !important;
+}
+
+.markdown-source-view.mod-cm6 .cm-highlight:has(.cmk-mark),
+.markdown-source-view.mod-cm6 .cmk-mark .cm-highlight {
+	background: transparent !important;
+}

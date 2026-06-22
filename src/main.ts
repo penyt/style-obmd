@@ -1,114 +1,363 @@
+import { Plugin } from "obsidian";
 import {
-	Editor,
-	MarkdownView,
-	MarkdownFileInfo,
-	Modal,
-	Notice,
-	Plugin,
-} from 'obsidian';
-import {
-	DEFAULT_SETTINGS,
-	MyPluginSettings,
-	SampleSettingTab,
-} from './settings';
+	EditorView,
+	Decoration,
+	DecorationSet,
+	ViewPlugin,
+	ViewUpdate,
+} from "@codemirror/view";
+import { RangeSetBuilder } from "@codemirror/state";
 
-// Remember to rename these classes and interfaces!
+type Key = "r" | "o" | "y" | "g" | "b" | "p" | "gray";
 
-export default class MyPlugin extends Plugin {
-	settings!: MyPluginSettings;
+const KEY_TO_CLASS: Record<Key, string> = {
+	r: "cmk-r",
+	o: "cmk-o",
+	y: "cmk-y",
+	g: "cmk-g",
+	b: "cmk-b",
+	p: "cmk-p",
+	gray: "cmk-gray",
+};
 
-	async onload() {
-		await this.loadSettings();
+function isAllowedKey(s: string): s is Key {
+	return (
+		s === "r" ||
+		s === "o" ||
+		s === "y" ||
+		s === "g" ||
+		s === "b" ||
+		s === "p" ||
+		s === "gray"
+	);
+}
 
-		// This creates an icon in the left ribbon.
-		this.addRibbonIcon('dice', 'Sample', (_evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
+interface HighlightRange {
+	prefixFrom: number;
+	prefixTo: number;
+	contentFrom: number;
+	contentTo: number;
+	suffixFrom: number;
+	suffixTo: number;
+	cls: string;
+}
+
+interface BoldRange {
+	keyFrom: number;
+	keyTo: number;
+	contentFrom: number;
+	contentTo: number;
+	rangeFrom: number;
+	rangeTo: number;
+	cls: string;
+}
+
+/**
+ * scan the range, find ==[key]content==
+ * returm the prefix, content, and suffix ranges
+ */
+function scanRange(text: string, baseOffset: number): HighlightRange[] {
+	const out: HighlightRange[] = [];
+	let i = 0;
+
+	while (i < text.length) {
+		// search for "==["
+		const start = text.indexOf("==[", i);
+		if (start === -1) break;
+
+		const keyStart = start + 3; // after "==["
+		const rb = text.indexOf("]", keyStart);
+		if (rb === -1) break;
+
+		const key = text.slice(keyStart, rb).trim().toLowerCase();
+		if (!isAllowedKey(key)) {
+			i = rb + 1;
+			continue;
+		}
+
+		const contentStart = rb + 1;
+
+		// search for the ending "=="
+		const end = text.indexOf("==", contentStart);
+		if (end === -1) break;
+
+		out.push({
+			prefixFrom: baseOffset + start,
+			prefixTo: baseOffset + contentStart,
+			contentFrom: baseOffset + contentStart,
+			contentTo: baseOffset + end,
+			suffixFrom: baseOffset + end,
+			suffixTo: baseOffset + end + 2,
+			cls: KEY_TO_CLASS[key],
 		});
 
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status bar text');
+		i = end + 2;
+	}
 
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'open-modal-simple',
-			name: 'Open modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			},
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'replace-selected',
-			name: 'Replace selected content',
-			editorCallback: (
-				editor: Editor,
-				_ctx: MarkdownView | MarkdownFileInfo,
-			) => {
-				editor.replaceSelection('Sample editor command');
-			},
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-modal-complex',
-			name: 'Open modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView =
-					this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
+	return out;
+}
 
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
+/**
+ * Scan the range and find **[key]content**.
+ */
+function scanBoldRange(text: string, baseOffset: number): BoldRange[] {
+	const out: BoldRange[] = [];
+	let i = 0;
+
+	while (i < text.length) {
+		const start = text.indexOf("**[", i);
+		if (start === -1) break;
+
+		const keyStart = start + 3;
+		const rb = text.indexOf("]", keyStart);
+		if (rb === -1) break;
+
+		const key = text.slice(keyStart, rb).trim().toLowerCase();
+		if (!isAllowedKey(key)) {
+			i = rb + 1;
+			continue;
+		}
+
+		const contentStart = rb + 1;
+		const end = text.indexOf("**", contentStart);
+		if (end === -1) break;
+
+		out.push({
+			keyFrom: baseOffset + start + 2,
+			keyTo: baseOffset + contentStart,
+			contentFrom: baseOffset + contentStart,
+			contentTo: baseOffset + end,
+			rangeFrom: baseOffset + start,
+			rangeTo: baseOffset + end + 2,
+			cls: KEY_TO_CLASS[key],
+		});
+
+		i = end + 2;
+	}
+
+	return out;
+}
+
+function buildDecorations(view: EditorView): DecorationSet {
+	const decorations: Array<{ from: number; to: number; deco: Decoration }> =
+		[];
+
+	// get the cursor line range
+	const cursorPos = view.state.selection.main.head;
+	const cursorLine = view.state.doc.lineAt(cursorPos);
+	const cursorLineFrom = cursorLine.from;
+	const cursorLineTo = cursorLine.to;
+
+	for (const vr of view.visibleRanges) {
+		const from = vr.from;
+		const to = vr.to;
+
+		// only get the visible text
+		const slice = view.state.doc.sliceString(from, to);
+
+		const items = scanRange(slice, from);
+		for (const it of items) {
+			// check if this highlight is on the cursor line
+			const isOnCursorLine =
+				it.prefixFrom <= cursorLineTo && it.suffixTo >= cursorLineFrom;
+
+			if (isOnCursorLine) {
+				// cursor is on this line, only color it, don't hide
+				decorations.push({
+					from: it.prefixFrom,
+					to: it.suffixTo,
+					deco: Decoration.mark({ class: `cmk-mark ${it.cls}` }),
+				});
+			} else {
+				// cursor is not on this line, hide the syntax markers
+				// hide the prefix ==[key]
+				decorations.push({
+					from: it.prefixFrom,
+					to: it.prefixTo,
+					deco: Decoration.mark({ class: "cmk-hide" }),
+				});
+				// content coloring
+				if (it.contentFrom < it.contentTo) {
+					decorations.push({
+						from: it.contentFrom,
+						to: it.contentTo,
+						deco: Decoration.mark({ class: `cmk-mark ${it.cls}` }),
+					});
 				}
-				return false;
-			},
-		});
+				// hide the suffix ==
+				decorations.push({
+					from: it.suffixFrom,
+					to: it.suffixTo,
+					deco: Decoration.mark({ class: "cmk-hide" }),
+				});
+			}
+		}
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+		const boldItems = scanBoldRange(slice, from);
+		for (const it of boldItems) {
+			const isOnCursorLine =
+				it.rangeFrom <= cursorLineTo && it.rangeTo >= cursorLineFrom;
 
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(activeDocument, 'click', (_evt: MouseEvent) => {
-			new Notice('Click');
-		});
+			if (!isOnCursorLine) {
+				decorations.push({
+					from: it.keyFrom,
+					to: it.keyTo,
+					deco: Decoration.mark({ class: "cmk-hide" }),
+				});
+			}
 
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(
-			window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000),
-		);
+			if (it.contentFrom < it.contentTo) {
+				decorations.push({
+					from: it.contentFrom,
+					to: it.contentTo,
+					deco: Decoration.mark({ class: `cmk-bold ${it.cls}` }),
+				});
+			}
+		}
 	}
 
-	onunload() {}
-
-	async loadSettings() {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			(await this.loadData()) as Partial<MyPluginSettings>,
-		);
+	// RangeSetBuilder 需要按 from 排序
+	decorations.sort((a, b) => a.from - b.from);
+	const builder = new RangeSetBuilder<Decoration>();
+	for (const d of decorations) {
+		builder.add(d.from, d.to, d.deco);
 	}
 
-	async saveSettings() {
-		await this.saveData(this.settings);
+	return builder.finish();
+}
+
+function makeEditorPlugin() {
+	return ViewPlugin.fromClass(
+		class {
+			decorations: DecorationSet;
+
+			constructor(view: EditorView) {
+				this.decorations = buildDecorations(view);
+			}
+
+			update(update: ViewUpdate) {
+				if (
+					update.docChanged ||
+					update.viewportChanged ||
+					update.selectionSet
+				) {
+					this.decorations = buildDecorations(update.view);
+				}
+			}
+		},
+		{
+			decorations: (v) => v.decorations,
+		},
+	);
+}
+
+function transformReadingView(el: HTMLElement) {
+	const doc = el.ownerDocument;
+
+	// 先處理被 Obsidian highlight 包起來的 mark 元素
+	const marks = Array.from(el.querySelectorAll("mark"));
+	for (const mark of marks) {
+		const raw = mark.textContent ?? "";
+		// 檢查是否符合 [key]content 格式
+		const match = raw.match(/^\[([a-z]+)\](.*)$/i);
+		if (match && match[1] && match[2] !== undefined) {
+			const key = match[1].toLowerCase();
+			const content = match[2];
+			if (isAllowedKey(key)) {
+				mark.className = `cmk-mark ${KEY_TO_CLASS[key]}`;
+				mark.textContent = content;
+			}
+		}
+	}
+
+	// Process **[key]content** rendered as a strong element.
+	const strongElements = Array.from(el.querySelectorAll("strong"));
+	for (const strong of strongElements) {
+		const raw = strong.textContent ?? "";
+		const match = raw.match(/^\[([a-z]+)\]/i);
+		if (!match?.[0] || !match[1]) continue;
+
+		const key = match[1].toLowerCase();
+		if (!isAllowedKey(key)) continue;
+
+		const walker = doc.createTreeWalker(
+			strong,
+			NodeFilter.SHOW_TEXT,
+		);
+		const firstText = walker.nextNode() as Text | null;
+		if (!firstText?.nodeValue?.startsWith(match[0])) continue;
+
+		firstText.nodeValue = firstText.nodeValue.slice(match[0].length);
+		strong.classList.add("cmk-bold", KEY_TO_CLASS[key]);
+	}
+
+	// 再處理純文字節點（未被 Obsidian highlight 處理的情況）
+	const walker = doc.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+	const nodes: Text[] = [];
+	let n: Node | null;
+
+	while ((n = walker.nextNode())) nodes.push(n as Text);
+
+	for (const tn of nodes) {
+		const raw = tn.nodeValue ?? "";
+		if (!raw.includes("==[")) continue;
+
+		const frag = doc.createDocumentFragment();
+		let i = 0;
+
+		while (i < raw.length) {
+			const start = raw.indexOf("==[", i);
+			if (start === -1) {
+				frag.appendChild(doc.createTextNode(raw.slice(i)));
+				break;
+			}
+
+			if (start > i)
+				frag.appendChild(doc.createTextNode(raw.slice(i, start)));
+
+			const keyStart = start + 3;
+			const rb = raw.indexOf("]", keyStart);
+			if (rb === -1) {
+				frag.appendChild(doc.createTextNode(raw.slice(start)));
+				break;
+			}
+
+			const key = raw.slice(keyStart, rb).trim().toLowerCase();
+			if (!isAllowedKey(key)) {
+				frag.appendChild(
+					doc.createTextNode(raw.slice(start, rb + 1)),
+				);
+				i = rb + 1;
+				continue;
+			}
+
+			const contentStart = rb + 1;
+			const end = raw.indexOf("==", contentStart);
+			if (end === -1) {
+				frag.appendChild(doc.createTextNode(raw.slice(start)));
+				break;
+			}
+
+			const content = raw.slice(contentStart, end);
+
+			const mark = doc.createElement("mark");
+			mark.className = `cmk-mark ${KEY_TO_CLASS[key]}`;
+			mark.textContent = content;
+
+			frag.appendChild(mark);
+			i = end + 2;
+		}
+
+		tn.parentNode?.replaceChild(frag, tn);
 	}
 }
 
-class SampleModal extends Modal {
-	onOpen() {
-		const { contentEl } = this;
-		contentEl.setText('Woah!');
-	}
+export default class StyleObmdPlugin extends Plugin {
+	async onload() {
+		// Live Preview
+		this.registerEditorExtension(makeEditorPlugin());
 
-	onClose() {
-		const { contentEl } = this;
-		contentEl.empty();
+		// Reading view
+		this.registerMarkdownPostProcessor((el) => transformReadingView(el));
 	}
 }
