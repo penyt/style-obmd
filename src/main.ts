@@ -216,7 +216,7 @@ function buildDecorations(view: EditorView): DecorationSet {
 		}
 	}
 
-	// RangeSetBuilder 需要按 from 排序
+	// RangeSetBuilder needs to be sorted by from
 	decorations.sort((a, b) => a.from - b.from);
 	const builder = new RangeSetBuilder<Decoration>();
 	for (const d of decorations) {
@@ -254,11 +254,11 @@ function makeEditorPlugin() {
 function transformReadingView(el: HTMLElement) {
 	const doc = el.ownerDocument;
 
-	// 先處理被 Obsidian highlight 包起來的 mark 元素
+	// First, process the mark elements wrapped by Obsidian highlight
 	const marks = Array.from(el.querySelectorAll("mark"));
 	for (const mark of marks) {
 		const raw = mark.textContent ?? "";
-		// 檢查是否符合 [key]content 格式
+		// Check if it matches the [key]content format
 		const match = raw.match(/^\[([a-z]+)\](.*)$/i);
 		if (match && match[1] && match[2] !== undefined) {
 			const key = match[1].toLowerCase();
@@ -291,7 +291,7 @@ function transformReadingView(el: HTMLElement) {
 		strong.classList.add("cmk-bold", KEY_TO_CLASS[key]);
 	}
 
-	// 再處理純文字節點（未被 Obsidian highlight 處理的情況）
+	// Then, process the plain text nodes (the cases not handled by Obsidian highlight)
 	const walker = doc.createTreeWalker(el, NodeFilter.SHOW_TEXT);
 	const nodes: Text[] = [];
 	let n: Node | null;
@@ -356,7 +356,6 @@ export default class StyleObmdPlugin extends Plugin {
 	async onload() {
 		// Live Preview
 		this.registerEditorExtension(makeEditorPlugin());
-
 		// Reading view
 		this.registerMarkdownPostProcessor((el) => transformReadingView(el));
 	}

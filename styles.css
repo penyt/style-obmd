@@ -1,10 +1,10 @@
 /* Reading view & Live Preview */
 .cmk-mark {
-	/* padding: 0 0.12em; */
-	/* border-radius: 0.2em; */
+	padding: 0 0.12em;
+	border-radius: 0.2em;
 }
 
-/* 隱藏語法標記 */
+/* hide syntax */
 .cmk-hide {
 	font-size: 0;
 	width: 0;
