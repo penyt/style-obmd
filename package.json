@@ -1,7 +1,7 @@
 {
 	"name": "style-obmd",
 	"version": "1.0.0",
-	"description": "A plugin to have some more styles based on the Obsidian markdown syntax.",
+	"description": "Add customizable colors to highlights and bold text, with commands to convert styled Markdown to inline HTML.",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
@@ -11,7 +11,7 @@
 		"lint": "eslint ."
 	},
 	"keywords": [],
-	"license": "0-BSD",
+	"license": "MIT",
 	"devDependencies": {
 		"@codemirror/state": "^6.5.0",
 		"@codemirror/view": "^6.38.6",

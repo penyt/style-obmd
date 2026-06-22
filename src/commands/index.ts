@@ -90,21 +90,24 @@ function registerVaultCommand(
 					try {
 						for (const file of files) {
 							try {
-								const source =
-									await plugin.app.vault.cachedRead(file);
-								const result = convertDocumentToHtml(
-									source,
-									includeDecoration,
-									colors,
-								);
-								if (result.count === 0) continue;
-
-								await plugin.app.vault.modify(
+								let markerCount = 0;
+								await plugin.app.vault.process(
 									file,
-									result.text,
+									(source) => {
+										const result =
+											convertDocumentToHtml(
+												source,
+												includeDecoration,
+												colors,
+											);
+										markerCount = result.count;
+										return result.text;
+									},
 								);
+								if (markerCount === 0) continue;
+
 								convertedFiles += 1;
-								convertedMarkers += result.count;
+								convertedMarkers += markerCount;
 							} catch (error) {
 								failedFiles += 1;
 								console.error(
