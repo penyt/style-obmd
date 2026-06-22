@@ -1,92 +1,88 @@
-# Obsidian Sample Plugin
+# Style Obmd for Obsidian
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+[English](README.md) | [繁體中文](README.zh-TW.md)
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+A simple Obsidian plugin that adds customizable colors to highlights and bold text, with commands to convert the styled Markdown into portable inline HTML.
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
+## Features
 
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open modal (simple)" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and outputs a Notice on click.
-- Registers a global interval which logs 'setInterval' to the console.
+- **Colored Highlights**: Add a color key inside standard highlight syntax, such as `=={r}red highlight==`.
+- **Colored Bold Text**: Add a color key inside standard bold syntax, such as `**{b}blue text**`.
+- **Live Preview and Reading View**: See the colors while editing and reading your notes.
+- **Customizable Colors**: Choose the red, orange, yellow, green, blue, purple, and gray colors in the plugin settings.
+- **Optional Decoration**: Add horizontal padding and rounded corners to highlights.
+- **HTML Conversion**: Convert Style Obmd markers in the current note or across the entire vault to HTML tags with inline styles.
 
-## First time developing plugins?
+## Usage
 
-Quick starting guide for new plugin devs:
+Use one of the supported color keys inside braces:
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `src/main.ts` to `main.js`.
-- Make changes to `src/main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+| Color  | Key      | Highlight example         | Bold example             |
+| :----- | :------- | :------------------------ | :----------------------- |
+| Red    | `{r}`    | `=={r}red highlight==`    | `**{r}red text**`        |
+| Orange | `{o}`    | `=={o}orange highlight==` | `**{o}orange text**`     |
+| Yellow | `{y}`    | `=={y}yellow highlight==` | `**{y}yellow text**`     |
+| Green  | `{g}`    | `=={g}green highlight==`  | `**{g}green text**`      |
+| Blue   | `{b}`    | `=={b}blue highlight==`   | `**{b}blue text**`       |
+| Purple | `{p}`    | `=={p}purple highlight==` | `**{p}purple text**`     |
+| Gray   | `{gray}` | `=={gray}gray highlight==` | `**{gray}gray text**`    |
 
-## Releasing new releases
+## Commands
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+Open the Command palette and run one of the following commands:
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+| Command                                      | Description                                                        |
+| :------------------------------------------- | :----------------------------------------------------------------- |
+| **Style Obmd: Convert current note styles to HTML**      | Convert all Style Obmd markers in the active note to inline HTML.  |
+| **Style Obmd: Convert all vault styles to HTML**         | Convert Style Obmd markers in every Markdown file in the vault.    |
 
-## Adding your plugin to the community plugin list
+The conversion commands skip fenced code blocks and inline code.
 
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+⚠️ The vault-wide command modifies multiple files and CANNOT be undone from a single editor history. Back up or commit your vault before running it.
 
-## How to use
+## Settings
 
-- Clone this repo.
-- Make sure your NodeJS is at least v18 (`node --version`).
-- `npm i` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
+You can customize the following options in **Settings → Style Obmd**:
 
-## Manually installing the plugin
+| Setting                  | Description                                                                 | Default   |
+| :----------------------- | :-------------------------------------------------------------------------- | :-------- |
+| **Highlight decoration** | Add horizontal padding and rounded corners to highlights and exported HTML. | On        |
+| **Red**                  | Color used by the `{r}` marker.                                             | `#fb4646` |
+| **Orange**               | Color used by the `{o}` marker.                                             | `#e9783f` |
+| **Yellow**               | Color used by the `{y}` marker.                                             | `#e0ac00` |
+| **Green**                | Color used by the `{g}` marker.                                             | `#44cf6e` |
+| **Blue**                 | Color used by the `{b}` marker.                                             | `#5389df` |
+| **Purple**               | Color used by the `{p}` marker.                                             | `#be75ff` |
+| **Gray**                 | Color used by the `{gray}` marker.                                          | `#9e9e9e` |
+| **Reset colors**         | Restore all marker colors to their default values.                          | —         |
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+Each selected color is used at full opacity for bold text and at 30% opacity for highlight backgrounds.
 
-## Improve code quality with eslint
+## Installation
 
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code.
-- This project already has eslint preconfigured, you can invoke a check by running`npm run lint`
-- Together with a custom eslint [plugin](https://github.com/obsidianmd/eslint-plugin) for Obsidan specific code guidelines.
-- A GitHub action is preconfigured to automatically lint every commit on all branches.
+### From Community Plugins
 
-## Funding URL
+_(Once the plugin is approved)_
 
-You can include funding URLs where people who use your plugin can financially support it.
+1. Open **Settings → Community plugins**.
+2. Turn off **Restricted mode**.
+3. Select **Browse** and search for `Style Obmd`.
+4. Select **Install**, then select **Enable**.
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+### Manual Installation
 
-```json
-{
-	"fundingUrl": "https://buymeacoffee.com"
-}
-```
+1. Go to the [Releases](https://github.com/penyt/style-obmd/releases) page.
+2. Download `main.js`, `manifest.json`, and `styles.css` from the latest release.
+3. Create a folder named `style-obmd` in your vault's plugin folder: `<Vault>/.obsidian/plugins/style-obmd`.
+4. Move the downloaded files into that folder.
+5. Reload Obsidian and enable the plugin in **Settings → Community plugins**.
 
-If you have multiple URLs, you can also do:
+## License
 
-```json
-{
-	"fundingUrl": {
-		"Buy Me a Coffee": "https://buymeacoffee.com",
-		"GitHub Sponsor": "https://github.com/sponsors",
-		"Patreon": "https://www.patreon.com/"
-	}
-}
-```
+[MIT](LICENSE)
 
-## API Documentation
+## Donate
 
-See https://docs.obsidian.md
+If you find this plugin helpful, please give me a GitHub star ⭐️ or buy me a coffee ☕️!
+
+<a href="https://www.buymeacoffee.com/penyt" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
