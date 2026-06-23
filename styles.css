@@ -14,56 +14,56 @@
 
 .cmk-mark.cmk-r,
 mark.cmk-r {
-	background: color-mix(in srgb, var(--style-obmd-r) 30%, transparent) !important;
+	background: color-mix(in srgb, var(--style-obmd-r) 30%, transparent);
 }
 .cmk-mark.cmk-o,
 mark.cmk-o {
-	background: color-mix(in srgb, var(--style-obmd-o) 30%, transparent) !important;
+	background: color-mix(in srgb, var(--style-obmd-o) 30%, transparent);
 }
 .cmk-mark.cmk-y,
 mark.cmk-y {
-	background: color-mix(in srgb, var(--style-obmd-y) 30%, transparent) !important;
+	background: color-mix(in srgb, var(--style-obmd-y) 30%, transparent);
 }
 .cmk-mark.cmk-g,
 mark.cmk-g {
-	background: color-mix(in srgb, var(--style-obmd-g) 30%, transparent) !important;
+	background: color-mix(in srgb, var(--style-obmd-g) 30%, transparent);
 }
 .cmk-mark.cmk-b,
 mark.cmk-b {
-	background: color-mix(in srgb, var(--style-obmd-b) 30%, transparent) !important;
+	background: color-mix(in srgb, var(--style-obmd-b) 30%, transparent);
 }
 .cmk-mark.cmk-p,
 mark.cmk-p {
-	background: color-mix(in srgb, var(--style-obmd-p) 30%, transparent) !important;
+	background: color-mix(in srgb, var(--style-obmd-p) 30%, transparent);
 }
 .cmk-mark.cmk-gray,
 mark.cmk-gray {
-	background: color-mix(in srgb, var(--style-obmd-gray) 30%, transparent) !important;
+	background: color-mix(in srgb, var(--style-obmd-gray) 30%, transparent);
 }
 
 .cmk-bold.cmk-r {
-	color: var(--style-obmd-r) !important;
+	color: var(--style-obmd-r);
 }
 .cmk-bold.cmk-o {
-	color: var(--style-obmd-o) !important;
+	color: var(--style-obmd-o);
 }
 .cmk-bold.cmk-y {
-	color: var(--style-obmd-y) !important;
+	color: var(--style-obmd-y);
 }
 .cmk-bold.cmk-g {
-	color: var(--style-obmd-g) !important;
+	color: var(--style-obmd-g);
 }
 .cmk-bold.cmk-b {
-	color: var(--style-obmd-b) !important;
+	color: var(--style-obmd-b);
 }
 .cmk-bold.cmk-p {
-	color: var(--style-obmd-p) !important;
+	color: var(--style-obmd-p);
 }
 .cmk-bold.cmk-gray {
-	color: var(--style-obmd-gray) !important;
+	color: var(--style-obmd-gray);
 }
 
 .markdown-source-view.mod-cm6 .cm-highlight:has(.cmk-mark),
 .markdown-source-view.mod-cm6 .cmk-mark .cm-highlight {
-	background: transparent !important;
+	background: transparent;
 }
