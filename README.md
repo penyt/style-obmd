@@ -8,6 +8,9 @@ Simply add a `{key}` to Obsidian’s built-in Markdown highlight or bold syntax.
 
 The conversion commands make it easy to preserve these styles when you need to publish notes as webpages.
 
+Demo:
+![Demo](style-obmd.png) _(Example visualization)_
+
 ## Features
 
 - **Colored Highlights**: Add a color key inside standard highlight syntax, such as `=={r}red highlight==`.
