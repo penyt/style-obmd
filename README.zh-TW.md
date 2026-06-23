@@ -2,16 +2,22 @@
 
 [English](README.md) | [繁體中文](README.zh-TW.md)
 
-一款簡單的 Obsidian 外掛，讓「螢光筆標記」與「粗體文字」加入可自訂的顏色，並提供將樣式 Markdown 轉換成可攜式 inline HTML 的指令。
+一款簡單的 Obsidian 外掛，為 <mark>螢光筆標記</mark> 與 <strong style="color: #fb4646;">粗體文字</strong> 加入 ***可自訂的顏色***，並提供將樣式 Markdown 轉換成可攜式 inline HTML 的命令。
+
+只要在 Obsidian 內建的 Markdown 螢光筆或粗體語法中加入 `{key}` 即可。即使解除安裝此外掛，文字仍會透過標準 Obsidian Markdown 語法保留螢光筆或粗體格式。
+
+如果有將筆記發布為網頁的需求，轉換命令可將標記轉換成 HTML 標籤，以保留這些樣式。
 
 ## 功能
 
-- **彩色螢光筆標記**：在標準螢光筆標記語法中加入{顏色}，例如 `=={r}紅色螢光筆==`。
-- **彩色粗體文字**：在標準粗體語法中加入{顏色}，例如 `**{b}藍色文字**`。
+- **彩色螢光筆標記**：在標準螢光筆標記語法中加入 {顏色}，例如 `=={r}紅色螢光筆==`。
+- **彩色粗體文字**：在標準粗體語法中加入 {顏色}，例如 `**{b}藍色文字**`。
 - **即時預覽與閱讀模式**：在編輯和閱讀筆記時直接顯示顏色。
-- **自訂顏色**：可在外掛設定頁面中調整紅、橘、黃、綠、藍、紫、灰七種顏色。
-- **選用裝飾樣式**：為螢光筆標記加入水平 padding 與圓角。
-- **HTML 轉換**：將目前筆記或整個儲存庫中的 Style Obmd 標記轉換成帶有 inline style 的 HTML 標籤。
+- 設定：
+  - **裝飾樣式（選用）**：為螢光筆標記加入水平 padding 與圓角（我的喜好😀）。
+  - **自訂顏色**：可在外掛設定頁面中調整紅、橘、黃、綠、藍、紫、灰七種顏色。
+- 命令：
+  - **HTML 轉換**：將目前筆記或整個儲存庫中的 Style Obmd 標記轉換成帶有 inline style 的 HTML 標籤。
 
 ## 使用方式
 
@@ -27,26 +33,13 @@
 | 紫色 | `{p}` | `=={p}紫色標記==` | `**{p}紫色文字**` |
 | 灰色 | `{gray}` | `=={gray}灰色標記==` | `**{gray}灰色文字**` |
 
-## 指令
-
-開啟命令選擇器並執行以下指令：
-
-| 指令 | 說明 |
-| :--- | :--- |
-| **Style Obmd: Convert current note styles to HTML** | 將目前筆記中的所有 Style Obmd 標記轉換成 inline HTML。 |
-| **Style Obmd: Convert all vault styles to HTML** | 將儲存庫內所有 Markdown 檔案中的 Style Obmd 標記轉換成 inline HTML。 |
-
-轉換指令會略過 fenced code block 與 inline code。
-
-⚠️ 整個儲存庫的轉換指令會修改多個檔案，無法從單一編輯器歷史紀錄中復原。執行前請先備份或 commit 你的儲存庫。
-
 ## 設定
 
 你可以在 **設定 → Style Obmd** 中調整以下選項：
 
 | 設定 | 說明 | 預設值 |
 | :--- | :--- | :----- |
-| **Highlight decoration** | 為螢光筆標記及匯出的 HTML 加入水平 padding 與圓角。 | 開啟 |
+| **Highlight decoration** | 為螢光筆標記及匯出的 HTML 加入水平 padding 與圓角（我的喜好😀）。 | 開啟 |
 | **Red** | `{r}` 標記使用的顏色。 | `#fb4646` |
 | **Orange** | `{o}` 標記使用的顏色。 | `#e9783f` |
 | **Yellow** | `{y}` 標記使用的顏色。 | `#e0ac00` |
@@ -56,7 +49,20 @@
 | **Gray** | `{gray}` 標記使用的顏色。 | `#9e9e9e` |
 | **Reset colors** | 將所有標記顏色恢復為預設值。 | — |
 
-每個自訂顏色會不透明套用於粗體文字，並以 30% 不透明度套用於螢光筆標記。
+每個自訂顏色會以完整不透明度套用於粗體文字，並以 30% 不透明度套用於螢光筆標記背景。
+
+## 命令
+
+開啟命令面板並執行以下命令：
+
+| 命令 | 說明 |
+| :--- | :--- |
+| **Style Obmd: Convert current note styles to HTML** | 將目前筆記中的所有 Style Obmd 標記轉換成 inline HTML。 |
+| **Style Obmd: Convert all vault styles to HTML** | 將儲存庫內所有 Markdown 檔案中的 Style Obmd 標記轉換成 inline HTML。 |
+
+轉換命令會略過 fenced code block 與 inline code。
+
+⚠️ 整個儲存庫的轉換命令（**Style Obmd: Convert all vault styles to HTML**）會修改多個檔案，無法從單一編輯器歷史紀錄中復原。執行前請先備份或 commit 你的儲存庫。
 
 ## 安裝
 

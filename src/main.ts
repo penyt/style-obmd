@@ -4,8 +4,8 @@ import {
 	ColorKey,
 	ColorPalette,
 } from "./conversion/converter";
-import { createEditorExtension } from "./live-preview/decorations";
-import { transformReadingView } from "./reading-view/processor";
+import { createLivePreviewExtension } from "./live-preview/decorations";
+import { processReadingView } from "./reading-view/processor";
 import {
 	DEFAULT_SETTINGS,
 	StyleColorSettingKey,
@@ -14,6 +14,8 @@ import {
 } from "./settings";
 
 const HIGHLIGHT_DECORATION_CLASS = "style-obmd-highlight-decoration";
+
+// color keys
 const COLOR_KEYS: ColorKey[] = [
 	"r",
 	"o",
@@ -23,6 +25,8 @@ const COLOR_KEYS: ColorKey[] = [
 	"p",
 	"gray",
 ];
+
+// corresponding css classes
 const KEY_TO_CLASS: Record<ColorKey, string> = {
 	r: "cmk-r",
 	o: "cmk-o",
@@ -32,6 +36,8 @@ const KEY_TO_CLASS: Record<ColorKey, string> = {
 	p: "cmk-p",
 	gray: "cmk-gray",
 };
+
+// corresponding css variables
 const COLOR_VARIABLES: Record<ColorKey, string> = {
 	r: "--style-obmd-r",
 	o: "--style-obmd-o",
@@ -50,6 +56,7 @@ function getColorClass(key: string): string {
 	return KEY_TO_CLASS[key as ColorKey];
 }
 
+// define the plugin class
 export default class StyleObmdPlugin extends Plugin {
 	settings!: StyleObmdSettings;
 
@@ -57,26 +64,33 @@ export default class StyleObmdPlugin extends Plugin {
 		await this.loadSettings();
 		this.applyStyles();
 
+		// Live Preview
 		this.registerEditorExtension(
-			createEditorExtension({
+			// call createLivePreviewExtension() in live-preview/decorations.ts
+			createLivePreviewExtension({
 				isColorKey,
 				getColorClass,
 			}),
 		);
+		// Reading View
 		this.registerMarkdownPostProcessor((element) =>
-			transformReadingView(element, {
+			// call processReadingView() in reading-view/processor.ts
+			processReadingView(element, {
 				isColorKey,
 				getColorClass,
 			}),
 		);
-		registerCommands(this, {
+		// commands
+		registerCommands(this, { // call registerCommands() in commands/index.ts
 			isHighlightDecorationEnabled: () =>
 				this.settings.highlightDecoration,
 			getColors: () => this.getColorPalette(),
 		});
+		// settings tab
 		this.addSettingTab(new StyleObmdSettingTab(this.app, this));
 	}
 
+	// Clean up styles when the plugin is disabled
 	onunload() {
 		const body = this.app.workspace.containerEl.ownerDocument.body;
 		body.classList.remove(HIGHLIGHT_DECORATION_CLASS);
@@ -85,11 +99,13 @@ export default class StyleObmdPlugin extends Plugin {
 		}
 	}
 
+	// Settings: Highlight Decoration
 	async setHighlightDecoration(enabled: boolean): Promise<void> {
 		this.settings.highlightDecoration = enabled;
 		await this.saveSettings();
 	}
 
+	// Settings: Color
 	async setColor(
 		key: StyleColorSettingKey,
 		value: string,
@@ -98,6 +114,7 @@ export default class StyleObmdPlugin extends Plugin {
 		await this.saveSettings();
 	}
 
+	// Settings: Reset Colors
 	async resetColors(): Promise<void> {
 		this.settings.redColor = DEFAULT_SETTINGS.redColor;
 		this.settings.orangeColor = DEFAULT_SETTINGS.orangeColor;

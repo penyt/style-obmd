@@ -220,7 +220,7 @@ function buildDecorations(
 	return builder.finish();
 }
 
-export function createEditorExtension(options: EditorExtensionOptions) {
+export function createLivePreviewExtension(options: EditorExtensionOptions) {
 	return ViewPlugin.fromClass(
 		class {
 			decorations: DecorationSet;

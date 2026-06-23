@@ -116,7 +116,7 @@ function transformPlainTextHighlights(
 	}
 }
 
-export function transformReadingView(
+export function processReadingView(
 	element: HTMLElement,
 	options: ReadingViewOptions,
 ): void {

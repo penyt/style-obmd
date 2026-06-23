@@ -2,16 +2,22 @@
 
 [English](README.md) | [繁體中文](README.zh-TW.md)
 
-A simple Obsidian plugin that adds customizable colors to highlights and bold text, with commands to convert the styled Markdown into portable inline HTML.
+A simple Obsidian plugin that adds ***customizable colors*** to <mark>highlights</mark> and <strong style="color: #fb4646;">bold text</strong>, with commands to convert the styled Markdown into portable inline HTML.
+
+Simply add a `{key}` to Obsidian’s built-in Markdown highlight or bold syntax. Even if you uninstall the plugin, the text will remain highlighted or bold using standard Obsidian Markdown syntax.
+
+The conversion commands make it easy to preserve these styles when you need to publish notes as webpages.
 
 ## Features
 
 - **Colored Highlights**: Add a color key inside standard highlight syntax, such as `=={r}red highlight==`.
 - **Colored Bold Text**: Add a color key inside standard bold syntax, such as `**{b}blue text**`.
 - **Live Preview and Reading View**: See the colors while editing and reading your notes.
-- **Customizable Colors**: Choose the red, orange, yellow, green, blue, purple, and gray colors in the plugin settings.
-- **Optional Decoration**: Add horizontal padding and rounded corners to highlights.
-- **HTML Conversion**: Convert Style Obmd markers in the current note or across the entire vault to HTML tags with inline styles.
+- Settings:
+  - **Decoration (optional)**: Add horizontal padding and rounded corners to highlights. (My preference 😀)
+  - **Customizable Colors**: Choose the red, orange, yellow, green, blue, purple, and gray colors in the plugin settings.
+- Commands:
+  - **HTML Conversion**: Convert Style Obmd markers in the current note or across the entire vault to HTML tags with inline styles.
 
 ## Usage
 
@@ -27,26 +33,13 @@ Use one of the supported color keys inside braces:
 | Purple | `{p}`    | `=={p}purple highlight==` | `**{p}purple text**`     |
 | Gray   | `{gray}` | `=={gray}gray highlight==` | `**{gray}gray text**`    |
 
-## Commands
-
-Open the Command palette and run one of the following commands:
-
-| Command                                      | Description                                                        |
-| :------------------------------------------- | :----------------------------------------------------------------- |
-| **Style Obmd: Convert current note styles to HTML**      | Convert all Style Obmd markers in the active note to inline HTML.  |
-| **Style Obmd: Convert all vault styles to HTML**         | Convert Style Obmd markers in every Markdown file in the vault.    |
-
-The conversion commands skip fenced code blocks and inline code.
-
-⚠️ The vault-wide command modifies multiple files and CANNOT be undone from a single editor history. Back up or commit your vault before running it.
-
 ## Settings
 
 You can customize the following options in **Settings → Style Obmd**:
 
 | Setting                  | Description                                                                 | Default   |
 | :----------------------- | :-------------------------------------------------------------------------- | :-------- |
-| **Highlight decoration** | Add horizontal padding and rounded corners to highlights and exported HTML. | On        |
+| **Highlight decoration** | Add horizontal padding and rounded corners to highlights and exported HTML. (My preference 😀) | On        |
 | **Red**                  | Color used by the `{r}` marker.                                             | `#fb4646` |
 | **Orange**               | Color used by the `{o}` marker.                                             | `#e9783f` |
 | **Yellow**               | Color used by the `{y}` marker.                                             | `#e0ac00` |
@@ -57,6 +50,19 @@ You can customize the following options in **Settings → Style Obmd**:
 | **Reset colors**         | Restore all marker colors to their default values.                          | —         |
 
 Each selected color is used at full opacity for bold text and at 30% opacity for highlight backgrounds.
+
+## Commands
+
+Open the command palette and run one of the following commands:
+
+| Command                                      | Description                                                        |
+| :------------------------------------------- | :----------------------------------------------------------------- |
+| **Style Obmd: Convert current note styles to HTML**      | Convert all Style Obmd markers in the active note to inline HTML.  |
+| **Style Obmd: Convert all vault styles to HTML**         | Convert Style Obmd markers in every Markdown file in the vault.    |
+
+The conversion commands skip fenced code blocks and inline code.
+
+⚠️ The vault-wide command (**Style Obmd: Convert all vault styles to HTML**) modifies multiple files and CANNOT be undone from a single editor history. Back up or commit your vault before running it.
 
 ## Installation
 
